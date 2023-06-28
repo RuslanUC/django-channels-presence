@@ -7,9 +7,16 @@ def touch_presence(func):
     @functools.wraps(func)
     def inner(consumer, text_data, *args, **kwargs):
         Presence.objects.touch(consumer.channel_name)
-        if text_data == '"heartbeat"':
-            return
         return func(consumer, text_data, *args, **kwargs)
+
+    return inner
+
+
+def touch_presence_async(func):
+    @functools.wraps(func)
+    async def inner(consumer, text_data, *args, **kwargs):
+        await Presence.objects.touch_async(consumer.channel_name)
+        return await func(consumer, text_data, *args, **kwargs)
 
     return inner
 
@@ -19,5 +26,14 @@ def remove_presence(func):
     def inner(consumer, *args, **kwargs):
         Presence.objects.leave_all(consumer.channel_name)
         return func(consumer, *args, **kwargs)
+
+    return inner
+
+
+def remove_presence_async(func):
+    @functools.wraps(func)
+    async def inner(consumer, *args, **kwargs):
+        await Presence.objects.leave_all_async(consumer.channel_name)
+        return await func(consumer, *args, **kwargs)
 
     return inner
