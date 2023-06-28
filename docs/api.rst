@@ -27,18 +27,30 @@ Models
     creates any needed ``Presence`` instance, and updates the channels group
     membership.  Returns the ``room`` instance.
 
+``async Room.objects.add_async(room_chanel_name, user_channel_name, user=None)``
+    Async version of ``Room.objects.add``.
+
 ``Room.objects.remove(room_channel_name, user_channel_name)``
     Remove the given ``user_channel_name`` from the room with
     ``room_channel_name``. Removes relevant ``Presence`` instances, and updates
     the channels group membership.
+
+``async Room.objects.remove_async(room_channel_name, user_channel_name)``
+    Async version of ``Room.objects.remove``.
 
 ``Room.objects.prune_presences(age_in_seconds=None)``
     Remove any ``Presence`` models whose ``last_seen`` timestamp is older than
     ``age_in_seconds`` (defaults to ``settings.CHANNELS_PRESENCE_MAX_AGE`` if
     not specified).
 
+``async Room.objects.prune_presences_async(age_in_seconds=None)``
+    Async version of ``Room.objects.prune_presences``.
+
 ``Room.objects.prune_rooms()``
     Remove any rooms that have no associated ``Presence`` models.
+
+``async Room.objects.prune_rooms()``
+    Async version of ``Room.objects.prune_rooms``.
   
 **Instance properties**:
 
@@ -55,6 +67,9 @@ Models
     Return the number of non-authenticated sockets which are present in this
     room.
 
+``async room.get_anonymous_count_async()``
+    Async version of ``room.get_anonymous_count``.
+
 ``Presence``
 -------------------------------------
 
@@ -68,9 +83,15 @@ Models
     Updates the ``last_seen`` timestamp to now for all instances with the given
     channel name.
 
+``async Presence.objects.touch_async(channel_name)``
+    Async version of ``Presence.objects.touch``.
+
 ``Presence.objects.leave_all(channel_name)``
     Removes all ``Presence`` instances with the given channel name.  Triggers
     ``channels_presence.signals.presence_changed`` for any changed rooms.
+
+``async Presence.objects.leave_all_async(channel_name)``
+    Async version of ``Presence.objects.leave_all``.
 
 **Instance properties**:
 
@@ -112,6 +133,23 @@ syncronous handlers.
         def receive(self, text_data=None, bytes_data=None):
             pass
 
+``touch_presence_async``
+-----------------------------------------------
+
+::
+
+    from chanels_presence.decorators import touch_presence_async
+
+Async version of ``touch_presence_async``.
+
+.. code-block:: python
+
+    from channels.generic.websocket import AsyncWebsocketConsumer
+
+    class MyConsumer(AsyncWebsocketConsumer):
+        @touch_presence_async
+        async def receive(self, text_data=None, bytes_data=None):
+            pass
 
 ``remove_presence``
 ------------------------------------------------
@@ -131,6 +169,24 @@ syncronous, so should only be used on syncronous handlers.
     class MyConsumer(WebsocketConsumer):
         @remove_presence
         def disconnect(self, close_code):
+            pass
+
+``remove_presence_async``
+------------------------------------------------
+
+.. code-block:: python
+
+    from chanels_presence.decorators import remove_presence_async
+
+Async version of ``remove_presence``.
+
+.. code-block:: python
+
+    from channels.generic.websocket import AsyncWebsocketConsumer
+
+    class MyConsumer(AsyncWebsocketConsumer):
+        @remove_presence_async
+        async def disconnect(self, close_code):
             pass
 
 Signals
