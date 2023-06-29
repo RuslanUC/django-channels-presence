@@ -22,12 +22,12 @@ class PresenceManager(models.Manager):
         await self.filter(channel_name=channel_name).aupdate(last_seen=now())
 
     def leave_all(self, channel_name):
-        for presence in self.select_related("room").filter(channel_name=channel_name):
+        for presence in self.select_related("room", "user").filter(channel_name=channel_name):
             room = presence.room
             room.remove_presence(presence=presence)
 
     async def leave_all_async(self, channel_name):
-        async for presence in self.select_related("room").filter(channel_name=channel_name):
+        async for presence in self.select_related("room", "user").filter(channel_name=channel_name):
             room = presence.room
             await room.remove_presence_async(presence=presence)
 
